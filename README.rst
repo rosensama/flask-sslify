@@ -4,7 +4,7 @@ Flask-SSLify
 This is a simple Flask extension that configures your Flask application to redirect
 all incoming requests to HTTPS.
 
-Redirects only occur when ``app.debug`` is ``False``.
+By default redirects only occur when ``app.debug`` is ``False``.
 
 Usage
 -----
@@ -68,6 +68,13 @@ You can exlude a path that starts with given string by including a list called `
      sslify = SSLify(app, skips=['mypath', 'anotherpath'])
 
 Or by including ``SSLIFY_SKIPS`` in your app's config.
+
+
+Use SSL When app.debug is True
+------------------------------
+You can use SSL when ``app.debug`` is ``True`` by passing the ``debug_ssl`` parameter.
+
+    sslify = SSLify(app, debug_ssl=True)
 
 
 Install

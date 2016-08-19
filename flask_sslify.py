@@ -8,9 +8,10 @@ YEAR_IN_SECS = 31536000
 class SSLify(object):
     """Secures your Flask App."""
 
-    def __init__(self, app=None, age=YEAR_IN_SECS, subdomains=False, permanent=False, skips=None):
+    def __init__(self, app=None, age=YEAR_IN_SECS, subdomains=False, permanent=False, skips=None, ssl_debug=False):
         self.app = app or current_app
         self.hsts_age = age
+        self.ssl_debug = ssl_debug
 
         self.app.config.setdefault('SSLIFY_SUBDOMAINS', False)
         self.app.config.setdefault('SSLIFY_PERMANENT', False)
@@ -48,12 +49,19 @@ class SSLify(object):
                     return True
         return False
 
+    @property
+    def debug_criteria(self):
+        if self.ssl_debug:
+            return False
+        else:
+            return current_app.debug
+
     def redirect_to_ssl(self):
         """Redirect incoming requests to HTTPS."""
         # Should we redirect?
         criteria = [
             request.is_secure,
-            current_app.debug,
+            self.debug_criteria,
             current_app.testing,
             request.headers.get('X-Forwarded-Proto', 'http') == 'https'
         ]

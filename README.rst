@@ -72,9 +72,9 @@ Or by including ``SSLIFY_SKIPS`` in your app's config.
 
 Use SSL When app.debug is True
 ------------------------------
-You can use SSL when ``app.debug`` is ``True`` by passing the ``debug_ssl`` parameter.::
+You can use SSL when ``app.debug`` is ``True`` by passing the ``ssl_debug`` parameter.::
 
-    sslify = SSLify(app, debug_ssl=True)
+    sslify = SSLify(app, ssl_debug=True)
 
 
 Install

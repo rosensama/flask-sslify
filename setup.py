@@ -12,8 +12,8 @@ from setuptools import setup
 
 setup(
     name='Flask-SSLify',
-    version='0.1.7',
-    url='https://github.com/rosensama/flask-sslify',
+    version='0.1.6',
+    url='https://github.com/kennethreitz/flask-sslify',
     license='BSD',
     author='Kenneth Reitz',
     author_email='me@kennethreitz.com',

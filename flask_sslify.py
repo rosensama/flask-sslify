@@ -2,30 +2,50 @@
 
 from flask import request, redirect, current_app
 
+
 YEAR_IN_SECS = 31536000
 
 
 class SSLify(object):
     """Secures your Flask App."""
 
-    def __init__(self, app=None, age=YEAR_IN_SECS, subdomains=False, permanent=False, skips=None, ssl_debug=False):
+    def __init__(self, app=None, age=YEAR_IN_SECS, subdomains=False,
+                 permanent=False, skips=None, ssl_debug=False):
         self.app = app or current_app
-        self.hsts_age = age
-        self.ssl_debug = ssl_debug
-
-        self.app.config.setdefault('SSLIFY_SUBDOMAINS', False)
-        self.app.config.setdefault('SSLIFY_PERMANENT', False)
-        self.app.config.setdefault('SSLIFY_SKIPS', None)
-
-        self.hsts_include_subdomains = subdomains or self.app.config['SSLIFY_SUBDOMAINS']
-        self.permanent = permanent or self.app.config['SSLIFY_PERMANENT']
-        self.skip_list = skips or self.app.config['SSLIFY_SKIPS']
+        self.defaults = {
+            'subdomains': subdomains,
+            'permanent': permanent,
+            'skips': skips,
+            'age': age,
+            'ssl_debug': ssl_debug
+        }
 
         if app is not None:
             self.init_app(app)
 
+    @property
+    def hsts_age(self):
+        return self.app.config['SSLIFY_AGE']
+
+    @property
+    def hsts_include_subdomains(self):
+        return self.app.config['SSLIFY_SUBDOMAINS']
+
+    @property
+    def permanent(self):
+        return self.app.config['SSLIFY_PERMANENT']
+
+    @property
+    def skip_list(self):
+        return self.app.config['SSLIFY_SKIPS']
+
     def init_app(self, app):
-        """Configures the configured Flask app to enforce SSL."""
+        """Configures the specified Flask app to enforce SSL."""
+        app.config.setdefault('SSLIFY_AGE', self.defaults['age'])
+        app.config.setdefault('SSLIFY_SUBDOMAINS', self.defaults['subdomains'])
+        app.config.setdefault('SSLIFY_PERMANENT', self.defaults['permanent'])
+        app.config.setdefault('SSLIFY_SKIPS', self.defaults['skips'])
+
         app.before_request(self.redirect_to_ssl)
         app.after_request(self.set_hsts_header)
 
@@ -51,7 +71,7 @@ class SSLify(object):
 
     @property
     def debug_criteria(self):
-        if self.ssl_debug:
+        if self.defalts['ssl_debug']:
             return False
         else:
             return current_app.debug
@@ -79,5 +99,6 @@ class SSLify(object):
         """Adds HSTS header to each response."""
         # Should we add STS header?
         if request.is_secure and not self.skip:
-            response.headers.setdefault('Strict-Transport-Security', self.hsts_header)
+            response.headers.setdefault(
+                'Strict-Transport-Security', self.hsts_header)
         return response
